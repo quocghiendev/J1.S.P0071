@@ -38,10 +38,6 @@ public class Task {
         this.reviewer = reviewer;
     }
 
-    public static int getCount() {
-        return count;
-    }
-
     public int getTaskTypeID() {
         return taskTypeID;
     }

@@ -46,7 +46,7 @@ public class TaskView {
     }
 
     public int inputId(List<Task> task){
-        return validation.inputInt("Id: ", 1, task.size());
+        return validation.inputInt("Id: ", 1, Integer.MAX_VALUE);
         
     }
     private String inputDate(){
