@@ -1,6 +1,7 @@
 package controller;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import model.Task;
@@ -9,7 +10,7 @@ import view.TaskView;
 public class TaskController {
 
     /**
-     * Danh sách ứng viên đang được quản lý (lưu trong ArrayList).
+     * Danh sách task đang được quản lý (lưu trong ArrayList).
      */
     private final List<Task> tasks;
 
@@ -18,9 +19,6 @@ public class TaskController {
      */
     private final TaskView view;
 
-    /**
-     * Tạo Controller với danh sách rỗng và View mặc định.
-     */
     public TaskController() {
         tasks = new ArrayList<>();
         view = new TaskView();
@@ -34,11 +32,6 @@ public class TaskController {
         try {
             runMenu();
         } catch (IllegalStateException e) {
-
-            /*
-             * Luồng nhập đã đóng (Ctrl+D / Ctrl+Z hoặc file input hết dữ
-             * liệu): không thể đọc tiếp nên thông báo và kết thúc.
-             */
             view.showMessage("\n" + e.getMessage()
                     + " Program terminated.");
         }
@@ -52,10 +45,7 @@ public class TaskController {
         while (true) {
             view.showMenu();
 
-            /*
-             * Menu có 5 chức năng đánh số từ 1 đến 5; View đọc và kiểm tra
-             * để lựa chọn luôn nằm trong khoảng này.
-             */
+            /* Menu có 4 chức năng; View đảm bảo lựa chọn nằm trong 1..4. */
             int choice = view.inputChoice(1, 4);
 
             switch (choice) {
@@ -63,7 +53,7 @@ public class TaskController {
                     addTask();
                     break;
                 case 2:
-                    deleteTask();
+                    menuDelete();
                     break;
                 case 3:
                     displayTask();
@@ -71,12 +61,6 @@ public class TaskController {
                 case 4:
                     view.showMessage("Program terminated.");
                     return;
-
-                default:
-
-                    /* Không xảy ra vì View đã kiểm tra lựa chọn hợp lệ. */
-                    view.showMessage("Invalid choice.");
-                    break;
             }
         }
     }
@@ -87,30 +71,54 @@ public class TaskController {
         view.showMessage("Task add successfully!");
     }
 
-    private void displayTask() {
-        if (tasks.isEmpty()) {
-            view.showMessage("List is empty!");
-            return;
+    /**
+     * Xóa task theo id.
+     *
+     * @param id id dạng chuỗi
+     * @throws NumberFormatException nếu id không phải số nguyên
+     * @throws Exception nếu id không tồn tại
+     */
+    public void deleteTask(int id) throws Exception {
+        if (!tasks.removeIf(t -> t.getId() == id)) {
+            throw new Exception("Id not found!");
         }
-        view.displayTask(tasks);
     }
 
-    private void deleteTask() {
+    /**
+     * Lấy danh sách task, sắp xếp tăng dần theo ID.
+     *
+     * @return danh sách task
+     */
+    public List<Task> getDataTasks() {
+        tasks.sort(Comparator.comparingInt(Task::getId));
+        return tasks;
+    }
+
+    private void menuDelete() {
         if (tasks.isEmpty()) {
             view.showMessage("List is empty!");
             return;
         }
+        view.showMessage("---------Del Task------");
 
+        /* Đọc id ngoài try để lỗi "input closed" vẫn thoát được chương trình. */
         int id = view.inputId(tasks);
-
-        for (int i = 0; i < tasks.size(); i++) {
-            if (tasks.get(i).getId() == id) {
-                tasks.remove(i);
-                view.showMessage("Task deleted successfully!");
-                return;
-            }
+        try {
+            deleteTask(id);
+            view.showMessage("Task deleted successfully!");
+        } catch (NumberFormatException | NullPointerException e) {
+            view.showMessage("Invalid id!");
+        } catch (Exception e) {
+            view.showMessage(e.getMessage()); // chỗ này in ra lỗi exception
         }
+    }
 
-        view.showMessage("Id not found!");
+    private void displayTask() {
+        List<Task> list = getDataTasks();
+        if (list.isEmpty()) {
+            view.showMessage("List is empty!");
+            return;
+        }
+        view.displayTask(list);
     }
 }

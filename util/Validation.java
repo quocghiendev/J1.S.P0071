@@ -27,7 +27,7 @@ public class Validation {
      */
     private static final String DATE_FORMAT = "dd-MM-yyyy";
     
-    public static final String NAME_REGEX = "^[\\p{L}\\s]+$";
+    public static final String NAME_REGEX = "^[\\p{L}0-9\\s]+$";
     
     public static final String STRING_REGEX_NO_NULL = ".+";
 

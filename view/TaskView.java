@@ -88,7 +88,8 @@ public class TaskView {
             showMessage(String.format(ROW_FORMAT, lstask.getId(),
                     lstask.getRequirementName(),
                     Task.TASK_LIST[lstask.getTaskTypeID() - 1],
-                    lstask.getDate(), lstask.getTime(),
+                    lstask.getDate(), 
+                    String.format("%.2f", lstask.getTime()),
                     lstask.getAssignee(),
                     lstask.getReviewer()));
         }
